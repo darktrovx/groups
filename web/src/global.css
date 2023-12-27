@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Roboto', sans-serif !important;
+    user-select: none !important;
+    overflow: hidden !important;
+    -webkit-scrollbar: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}

@@ -5,6 +5,12 @@ local function RequestCreateGroup()
 end
 exports('RequestCreateGroup', RequestCreateGroup)
 
+local function RequestGroupsList()
+    local groups = lib.callback.await('groups:RequestGroups', false)
+    return groups
+end
+exports('RequestGroupsList', RequestGroupsList)
+
 local function LeaveGroup()
     local success = lib.callback.await('groups:LeaveGroup', false)
     return success

@@ -39,6 +39,18 @@ function group.Delete(groupID)
     GROUPS[groupID] = nil
 end
 
+function group.GetGroups()
+    local temp = {}
+    for groupID,_ in pairs(GROUPS) do
+        temp[#temp + 1] = {
+            id = groupID,
+            name = GROUPS[groupID].members[1],
+            members = #GROUPS[groupID].members,
+        }
+    end
+    return temp
+end
+
 function group.AddPlayer(groupID, source)
     local ps = group.GetPlayer(source)
     if ps.groupID then
@@ -340,6 +352,10 @@ end)
 lib.callback.register('groups:LeaveGroup', function(source)
     local ps = group.GetPlayer(source)
     return group.RemovePlayer(ps.groupID, source)
+end)
+
+lib.callback.register('groups:RequestGroups', function(source)
+    return group.GetGroups()
 end)
 
 lib.callback.register('groups:GetRequests', function(source)

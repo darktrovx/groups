@@ -2,7 +2,6 @@
 
   import NUI from './components/NUI.vue';
   import Group from './components/Group.vue';
-import Task from './components/Task.vue';
 
   export default {
     components: {

@@ -28,15 +28,16 @@ end
 function group.Delete(groupID)
     if not GROUPS[groupID] then
         Debug("[Delete] Group does not exist.")
-        return
+        return false
     end
 
     local members = group.GetMembers(groupID)
     for i = 1, #members do
-        group.RemovePlayer(groupID, members[i])
+        group.RemovePlayer(groupID, members[i].id)
     end
 
     GROUPS[groupID] = nil
+    return true
 end
 
 function group.GetGroups()
@@ -83,7 +84,7 @@ function group.AddPlayer(groupID, source)
 end
 
 function group.RemovePlayer(groupID, playerID)
-    Debug('REMOVE PLAYER: '..groupID..' '..source)
+    Debug('REMOVE PLAYER: '..groupID..' '..playerID)
     local ps = group.GetPlayer(playerID)
     if not ps.groupID then
         Debug("[RemovePlayer] Player does not have a group.")
@@ -351,6 +352,11 @@ end)
 
 lib.callback.register('groups:LeaveGroup', function(source)
     local ps = group.GetPlayer(source)
+
+    if ps.groupOwner then
+        return group.Delete(ps.groupID)
+    end
+
     return group.RemovePlayer(ps.groupID, source)
 end)
 

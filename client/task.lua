@@ -1,4 +1,4 @@
-local task = {}
+task = {}
 
 function task.Create()
 

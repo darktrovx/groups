@@ -20,6 +20,14 @@ function task.Update(steps, step)
         step = Task.step,
         steps = TASK.steps,
     })
+    TriggerEvent("groups:SendTaskUpdate", steps, step)
+end
+
+function task.GetTaskData()
+    return {
+        steps = TASK.steps,
+        step = TASK.step,
+    }
 end
 
 function task.Complete()
@@ -78,10 +86,11 @@ RegisterNetEvent("groups:TaskUpdate", function(steps, step)
     task.Update(nil, step)
 end)
 
+RegisterNetEvent("groups:SendTaskUpdate", function(steps, step)
+    -- Example event for external apps to get data from.
+end)
+
 -- NUI Callbacks
 RegisterNUICallback("GetTaskData", function(data, cb)
-    cb({
-        steps = TASK.steps,
-        step = TASK.step,
-    })
+    cb(task.GetTaskData())
 end)

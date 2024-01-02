@@ -12,8 +12,8 @@ AddEventHandler("onResourceStart", function(name)
     local Players = GetPlayers()
 
     for i = 1, #Players do
-        Debug("Setting groupID to nil for "..Players[i])
-        Player(Players[i]).state.groupID = nil
+        Debug("Setting groupID to false for "..Players[i])
+        Player(Players[i]).state.groupID = false
     end
 end)
 
@@ -26,17 +26,18 @@ AddEventHandler("onResourceStop", function(name)
 end)
 
 AddEventHandler("playerJoining", function()
-    local source = source
-    local groupID = group.GetGroup(source)
-    if groupID then
-        group.AddPlayer(groupID, source)
-    end
+    local src = source
+    -- local groupID = group.GetGroup(source)
+    -- if groupID then
+    --     group.AddPlayer(groupID, source)
+    -- end
+    Player(src).state.groupID = false
 end)
 
 AddEventHandler("playerDropped", function(reason)
-    local source = source
-    local ps = group.GetPlayer(source)
+    local src = source
+    local ps = Player(src).state
     if ps.groupID then
-        group.RemovePlayer(ps.groupID, source)
+        group.RemovePlayer(ps.groupID, src)
     end
 end)

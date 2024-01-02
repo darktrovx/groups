@@ -43,6 +43,11 @@
             if (!cb) { return }
             this.Cleanup()
         },
+        Join: function(data) {
+            this.InGroup = true;
+            this.Owner = false;
+            this.Members = data.members;
+        },
         Cleanup: function() {
             this.InGroup = false;
             this.Owner = false;
@@ -63,6 +68,9 @@
                     break;
                 case "updateGroups":
                     this.Groups = event.data.groups
+                    break;
+                case "groupJoined":
+                    Join(event.data);
                     break;
             }
         });

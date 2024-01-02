@@ -25,8 +25,8 @@ end
 
 function task.GetTaskData()
     return {
-        steps = TASK.steps,
-        step = TASK.step,
+        steps = TASK.steps or {},
+        step = TASK.step or 1,
     }
 end
 

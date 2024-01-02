@@ -1,9 +1,10 @@
 group = {}
 
 function group.Create(source)
-    local ps = group.GetPlayer(source)
+    Debug(string.format("[Create] Group Create requested. SOURCE:  %s", source))
+    local ps = Player(source).state
     if ps.groupID then
-        Debug("[Create] Player already has a group.")
+        Debug(string.format("[Create] PlayerID: %s already has a group. GroupID: %s", source, ps.groupID))
         return false
     end
 
@@ -17,8 +18,8 @@ function group.Create(source)
         requests = {},
     }
 
-    ps.groupOwner = true
-    Debug("[Create] Player set to owner for groupID: "..id)
+    ps.owner = true
+    Debug(string.format("[Create] PlayerID: %s set owner for groupID: %s", source, id))
 
     group.AddPlayer(id, source)
 
@@ -45,7 +46,7 @@ function group.GetGroups()
     for groupID,_ in pairs(GROUPS) do
         temp[#temp + 1] = {
             id = groupID,
-            name = GROUPS[groupID].members[1],
+            name = GROUPS[groupID].members[1].name,
             members = #GROUPS[groupID].members,
         }
     end
@@ -53,58 +54,67 @@ function group.GetGroups()
 end
 
 function group.AddPlayer(groupID, source)
-    local ps = group.GetPlayer(source)
+    local ps = Player(source).state
     if ps.groupID then
-        Debug("[AddPlayer] Player already has a group.")
+        Debug(string.format("[AddPlayer] PlayerID: %s already has a group. GroupID: %s", source, ps.groupID))
         Notify(source, "You are already in a group", "error")
         return false
     end
 
     if not GROUPS[groupID] then
-        Debug("[AddPlayer] Group does not exist.")
+        Debug(string.format("[AddPlayer] GroupID: %s does not exist", groupID))
         return false
     end
 
     if #group.GetMembers(groupID) >= Config.GroupLimit then
-        Debug("[AddPlayer] Group is full.")
+        Debug(string.format("[AddPlayer] GroupID: %s is full", groupID))
         Notify(source, "Group is full", "error")
-        return
+        return false
     end
 
     local license = GetPlayerIdentifierByType(source, 'license2') or GetPlayerIdentifierByType(source, 'license')
+    local name = GetMemberName(source)
+    local memberID = #GROUPS[groupID].members + 1
 
     ps.groupID = groupID
-    GROUPS[groupID].members[#GROUPS[groupID].members + 1] = {
-        name = GetMemberName(source),
+    Debug(string.format("[AddPlayer] PlayerID: %s GroupID Set: %s", source, groupID))
+
+    GROUPS[groupID].members[memberID] = {
+        name = name,
         id = source,
         license = license,
-        owner = ps.groupOwner,
+        owner = ps.owner,
     }
-    TriggerClientEvent("groups:GroupJoinEvent", source, groupID)
+
+    TriggerClientEvent("groups:GroupJoinEvent", source)
+
+    group.TriggerEvent(groupID, "groups:GroupMembersUpdate", {
+        name = name,
+        id = source,
+        memberID = memberID,
+        owner = ps.owner,
+    })
+
 end
 
 function group.RemovePlayer(groupID, playerID)
-    Debug('REMOVE PLAYER: '..groupID..' '..playerID)
-    local ps = group.GetPlayer(playerID)
+    Debug('[RemovePlayer] Removed Player : '..playerID..' from GROUP ID: '..groupID)
+    local ps = Player(playerID).state
     if not ps.groupID then
         Debug("[RemovePlayer] Player does not have a group.")
         return false
     end
 
     ps.groupID = nil
-    ps.groupOwner = false
+    ps.owner = false
 
     TriggerClientEvent("groups:GroupLeaveEvent", playerID)
     return true
 end
 
-function group.GetPlayer(source)
-    return Player(source).state
-end
-
 function group.GetMembers(groupID)
     if not GROUPS[groupID] then
-        Debug("[GetMembers] Group does not exist.")
+        Debug("[GetMembers] Group does not exist. GROUPID: "..tostring(groupID))
         return
     end
     return GROUPS[groupID].members or {}
@@ -116,7 +126,8 @@ function group.CreateRequest(groupID, source)
         return false
     end
 
-    local ps = group.GetPlayer(source)
+    local ps = Player(source).state
+    Debug(string.format("[CreateRequest]: playerID: %s, groupID: %s", source, groupID))
     if ps.groupID then
         Debug("[CreateRequest] Player already has a group.")
         return false
@@ -126,29 +137,25 @@ function group.CreateRequest(groupID, source)
     return true
 end
 
-function group.DeleteRequest(groupID, source, requestID)
+function group.DeleteRequest(groupID, requestID)
     if not GROUPS[groupID] then
         Debug("[DeleteRequest] Group does not exist.")
-        return
+        return false
     end
 
     if not GROUPS[groupID].requests[requestID] then
         Debug("[DeleteRequest] Request does not exist.")
-        return
+        return false
     end
 
     GROUPS[groupID].requests[requestID] = nil
-end
-
-function group.GetRequests(groupID)
-    if not GROUPS[groupID] then
-        Debug("[GetRequests] Group does not exist.")
-        return
-    end
-    return GROUPS[groupID].requests or {}
+    return true
 end
 
 function group.AcceptRequest(groupID, source, requestID)
+
+    Debug(string.format("[AcceptRequest]: groupID: %s, requestID: %s", groupID, requestID))
+
     if not GROUPS[groupID] then
         Debug("[AcceptRequest] Group does not exist.")
         return false
@@ -159,25 +166,35 @@ function group.AcceptRequest(groupID, source, requestID)
         return false
     end
 
-    local ps = group.GetPlayer(source)
+    local ps = Player(source).state
     if not ps.owner then
         Debug("[AcceptRequest] Player is not owner of group")
         return false
     end
 
     if GROUPS[groupID].requests[requestID] then
-        local rs = group.GetPlayer(GROUPS[groupID].requests[requestID].id)
+        local requestSrc = GROUPS[groupID].requests[requestID].id
+        local rs = Player(requestSrc).state
         if rs.groupID then
             Debug("[AcceptRequest] Requester already has a group.")
             return false
         end
-        group.AddPlayer(groupID, request.id)
-        group.DeleteRequest(groupID, source, requestID)
-        return true
+
+        group.AddPlayer(groupID, requestSrc)
+        return group.DeleteRequest(groupID, requestID)
     end
 
     return false
 end
+
+function group.GetRequests(groupID)
+    if not GROUPS[groupID] then
+        Debug("[GetRequests] Group does not exist.")
+        return
+    end
+    return GROUPS[groupID].requests or {}
+end
+
 
 function group.SetState(groupID, state)
     if not group.Exists(groupID) then
@@ -351,13 +368,17 @@ lib.callback.register('groups:CreateGroup', function(source)
 end)
 
 lib.callback.register('groups:LeaveGroup', function(source)
-    local ps = group.GetPlayer(source)
+    local ps = Player(source).state
 
-    if ps.groupOwner then
+    if ps.owner then
         return group.Delete(ps.groupID)
     end
 
     return group.RemovePlayer(ps.groupID, source)
+end)
+
+lib.callback.register('groups:RequestJoin', function(source, groupID)
+    return group.CreateRequest(groupID, source)
 end)
 
 lib.callback.register('groups:RequestGroups', function(source)
@@ -365,13 +386,12 @@ lib.callback.register('groups:RequestGroups', function(source)
 end)
 
 lib.callback.register('groups:GetRequests', function(source)
-    local ps = group.GetPlayer(source)
+    local ps = Player(source).state
     return group.GetRequests(ps.groupID)
 end)
 
 lib.callback.register('groups:GetMembers', function(source)
-    local ps = group.GetPlayer(source)
-    print('GetMembersCall '..tostring(ps.groupID))
+    local ps = Player(source).state
     return group.GetMembers(ps.groupID)
 end)
 
@@ -379,19 +399,19 @@ end)
 
 RegisterNetEvent('groups:AcceptRequest', function(requestID)
     local src = source
-    local ps = group.GetPlayer(src)
+    local ps = Player(src).state
     group.AcceptRequest(ps.groupID, src, requestID)
 end)
 
 RegisterNetEvent('groups:DenyRequest', function(requestID)
     local src = source
-    local ps = group.GetPlayer(src)
+    local ps = Player(src).state
     group.DeleteRequest(ps.groupID, src, requestID)
 end)
 
 RegisterNetEvent('groups:Kick', function(playerID)
     local src = source
-    local ps = group.GetPlayer(src)
+    local ps = Player(src).state
     group.RemovePlayer(ps.groupID, playerID)
 end)
 

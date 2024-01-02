@@ -1,9 +1,10 @@
+local GROUP_MEMBERS = {}
 
-local function RequestCreateGroup()
+local function CreateGroup()
     local success = lib.callback.await('groups:CreateGroup', false)
     return success
 end
-exports('RequestCreateGroup', RequestCreateGroup)
+exports('CreateGroup', CreateGroup)
 
 local function RequestGroupsList()
     local groups = lib.callback.await('groups:RequestGroups', false)
@@ -17,8 +18,8 @@ local function LeaveGroup()
 end
 exports('LeaveGroup', LeaveGroup)
 
-local function RequestJoin()
-    local success = lib.callback.await('groups:JoinGroup', false)
+local function RequestJoin(groupID)
+    local success = lib.callback.await('groups:RequestJoin', false, groupID)
     return success
 end
 exports('RequestJoin', RequestJoin)
@@ -40,6 +41,7 @@ end
 exports('DenyRequest', DenyRequest)
 
 local function GetMembers()
+    if #GROUP_MEMBERS ~= 0 then return GROUP_MEMBERS end
     local success = lib.callback.await('groups:GetMembers', false)
     return success
 end
@@ -50,9 +52,38 @@ local function Kick(id)
 end
 exports('Kick', Kick)
 
--- EVENTS
-RegisterNetEvent("groups:GroupJoinEvent", function()
+local function GetGroupID()
+    return LocalPlayer.state.groupID
+end
+exports('GetGroupID', GetGroupID)
 
+local function GetTaskData()
+    return task.GetTaskData()
+end
+exports('GetTaskData', GetTaskData)
+
+-- EVENTS
+
+RegisterNetEvent("groups:GroupJoinEvent", function()
+    if Config.UI then
+        SendNUIMessage({
+            type = "groupJoined"
+        })
+    end
+end)
+
+RegisterNetEvent("groups:GroupMembersUpdate", function(members)
+    GROUP_MEMBERS = members
+    if Config.UI then
+        SendNUIMessage({
+            type = "groupJoined",
+            members = members
+        })
+    end
+end)
+
+RegisterNetEvent("groups:GroupMemberLeaveEvent", function(id)
+    GROUP_MEMBERS[id] = nil
 end)
 
 RegisterNetEvent("groups:GroupLeaveEvent", function()
@@ -119,7 +150,7 @@ RegisterNUICallback("Deny", function(data, cb)
     cb('ok')
 end)
 
-RegisterNUICallback("GetMembers", function(data, cb)
+RegisterNUICallback("RequestMembers", function(data, cb)
     cb(GetMembers())
 end)
 

@@ -4,8 +4,9 @@
 This script aims to replace and improve on my first iteration of a group handler.
 Still working on it but the base is there with working UI.
 To use the built in UI navigate to config/shared.lua and set `standaloneUI = false` to `standaloneUI = true`
+There is also an npwd app I've made ( also still a WIP ) [npwd_groups](https://github.com/darktrovx/npwd_groups)
 
-There is also an npwd app I've made ( also still a WIP ) https://github.com/darktrovx/npwd_groups
+This script is currently setup to work with [Qbox](https://github.com/Qbox-project) and [ox_inventory](https://github.com/overextended/ox_inventory)
 
 This update has no backwards compatibility and any existing group scripts will not work with it.
 
@@ -66,7 +67,7 @@ exports["groups"]:RewardMembers(groupID, rewardData)
 -- Triggers an event on ALL members of a group.
 exports["groups"]:TriggerEvent(groupID, event, data)
 -- Notifies ALL group members.
-exports["groups"]:Notify(groupID, text, style)
+exports["groups"]:Notify(groupID, notifData)
 -- Abandons current group (destroys)
 exports["groups"]:Abandon(groupID, playerId)
 -- Get the average reputation for a specific reputation for the entire group.

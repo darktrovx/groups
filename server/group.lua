@@ -349,13 +349,13 @@ function group.TriggerEvent(groupID, event, data)
     end
 end exports('TriggerEvent', group.TriggerEvent)
 
-function group.Notify(groupID, text, style)
+function group.Notify(groupID, notifData)
     if not GROUPS[groupID] then return Debug('[Notify]', "Group does not exist.") end
     if text == nil then return Debug('[Notify]', "no valid text was passed to GroupNotify") end
 
     local members = group.GetMembers(groupID)
     for i=1,#members do
-        util.notify(members[i].id, text, style)
+        util.notify(members[i].id, notifData)
     end
 end exports('Notify', group.Notify)
 

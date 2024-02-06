@@ -1,11 +1,10 @@
 local util = {}
 
-function util.notify(source, text, style)
-    TriggerClientEvent('ox_lib:notify', source, {
-        title = 'Groups',
-        description = text,
-        type = style,
-    })
+function util.notify(source, notifData)
+    notifData.type = notifData.type or 'info'
+    notifData.title = notifData.title or 'Notification'
+    notifData.description = notifData.description or 'No description'
+    TriggerClientEvent('ox_lib:notify', source, notifData)
 end
 
 function util.getPlayerCID(source)

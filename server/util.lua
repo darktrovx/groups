@@ -1,4 +1,6 @@
-function Notify(source, text, style)
+local util = {}
+
+function util.notify(source, text, style)
     TriggerClientEvent('ox_lib:notify', source, {
         title = 'Groups',
         description = text,
@@ -6,30 +8,38 @@ function Notify(source, text, style)
     })
 end
 
-function GetMemberName(source)
-    -- local name = "Unknown "..math.random(0000, 9999)
-    -- return name
-    local Player = exports['qbx_core']:GetPlayer(source)
+function util.getPlayerCID(source)
+    return exports.qbx_core:GetPlayer(source).PlayerData.citizenid
+end
+
+function util.getMemberName(source)
+    local Player = exports.qbx_core:GetPlayer(source)
     local name = Player.PlayerData.charinfo.firstname.." "..Player.PlayerData.charinfo.lastname
     return name
 end
 
-function AddMoney(source, account, amount)
-
+function util.addMoney(source, account, amount)
+    local Player = exports.qbx_core:GetPlayer(source)
+    return Player.Functions.AddMoney(account, amount)
 end
 
-function RemoveMoney(source, account, amount)
-
+function util.removeMoney(source, account, amount)
+    local Player = exports.qbx_core:GetPlayer(source)
+    return Player.Functions.AddMoney(account, amount)
 end
 
-function AddItem(source, item, amount)
-
+function util.addItem(source, item, amount, metadata, slot)
+    local success, resp = exports.ox_inventory:AddItem(source, item, amount, metadata, slot)
+    return success, resp
 end
 
-function RemoveItem(source, item, amount)
-
+function util.removeItem(source, item, amount, metadata, slot)
+    local success, resp = exports.ox_inventory:RemoveItem(source, item, amount, metadata, slot)
+    return success, resp
 end
 
-function HasItem(source, item, amount)
-
+function util.hasItem(source, item, metadata, strict)
+    return exports.ox_inventory:GetItemCount(item, metadata, strict)
 end
+
+return util

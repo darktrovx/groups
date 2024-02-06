@@ -1,10 +1,12 @@
 TASK = {}
 GROUP_BLIPS = {}
 
-function Debug(text)
-    if Config.Debug then
-        print("[devyn-groups] "..text)
-    end
+local shared = require 'config.shared'
+
+function Debug(area, text)
+    if not shared.debug then return end
+    area = area or 'groups'
+    print(string.format('%s: %s', area, text))
 end
 
 local function OpenUI()
@@ -15,18 +17,15 @@ local function OpenUI()
 end
 
 local function CloseUI()
-    SendNUIMessage({
-        type = "close",
-    })
     SetNuiFocus(false, false)
 end
 
-RegisterNUICallback('close', function(data, cb)
+RegisterNUICallback('Close', function(data, cb)
     CloseUI()
     cb('ok')
 end)
 
-if Config.UI then
+if shared.standaloneUI then
     RegisterCommand('+group', function()
         OpenUI()
     end, false)

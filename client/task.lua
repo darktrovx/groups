@@ -94,3 +94,5 @@ end)
 RegisterNUICallback("GetTaskData", function(data, cb)
     cb(task.GetTaskData())
 end)
+
+return task

@@ -18,7 +18,7 @@
         },
         methods: {
             GetTaskData: async function() {
-                const task = await NUI.methods.NUICallback("GetTaskData")
+                const task = await NUI.methods.Callback("GetTaskData")
                 if (!task) { return }
                 this.Steps = task.steps
                 this.Step = task.step

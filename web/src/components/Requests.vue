@@ -12,16 +12,16 @@
         },
         methods: {
             GetRequests: async function() {
-                const requests = await NUI.methods.NUICallback("GetRequests")
+                const requests = await NUI.methods.Callback("GetRequests")
                 if (!requests) { return }
                 this.Requests = requests
             },
             Accept: function(requestID) {
-                NUI.methods.NUICallback("Accept", { requestID: requestID })
+                NUI.methods.Callback("Accept", { requestID: requestID })
                 this.GetRequests()
             },
             Deny: function(requestID) {
-                NUI.methods.NUICallback("Deny", { requestID: requestID })
+                NUI.methods.Callback("Deny", { requestID: requestID })
                 this.GetRequests()
             },
         },

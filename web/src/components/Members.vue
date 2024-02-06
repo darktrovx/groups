@@ -12,12 +12,12 @@
         },
         methods: {
             GetMembers: async function() {
-                const members = await NUI.methods.NUICallback("GetMembers")
+                const members = await NUI.methods.Callback("GetMembers")
                 if (!members) { return }
                 this.Members = members
             },
             Kick: function(id) {
-                NUI.methods.NUICallback("Kick", { id: id })
+                NUI.methods.Callback("Kick", { id: id })
                 this.GetMembers()
             },
         },

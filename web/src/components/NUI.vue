@@ -1,9 +1,13 @@
 <script>
   export default {
     name: 'NUI',
-    data() {},
+    data() {
+      return {
+        resourceName: "groups",
+      }
+    },
     methods: {
-        NUICallback: async function(eventName, data = {}) {
+        Callback: async function(eventName, data = {}) {
           const options = {
             method: "post",
             headers: {
@@ -12,17 +16,16 @@
             body: JSON.stringify(data),
           };
 
-          const resourceName = "devyn-groups";
 
+          const resourceName = 'groups';
           try {
-            const resp = await fetch(`https://${resourceName}/${eventName}`, options);
-            // resp.then((response) => {
-            //   const jsonPromise = response.json();
-            //   jsonPromise.then((data) => {
-            //     return data;
-            //   });
-            // });
-            return await resp.json();
+            const resp = await fetch(`https://${ resourceName }/${ eventName }`, options);
+            resp.then((response) => {
+              const jsonPromise = response.json();
+              jsonPromise.then((data) => {
+                return data;
+              });
+            });
           } catch(err) {
           }
         },

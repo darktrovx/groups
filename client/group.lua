@@ -1,5 +1,10 @@
 local GROUP_MEMBERS = {}
 
+local shared = require 'config.shared'
+local util = require 'client.util'
+local blips = require 'client.blips'
+local task = require 'client.task'
+
 local function CreateGroup()
     local success = lib.callback.await('groups:CreateGroup', false)
     return success
@@ -62,10 +67,15 @@ local function GetTaskData()
 end
 exports('GetTaskData', GetTaskData)
 
+local function IsOwner()
+    return LocalPlayer.state.groupOwner
+end
+exports('IsOwner', IsOwner)
+
 -- EVENTS
 
 RegisterNetEvent("groups:GroupJoinEvent", function()
-    if Config.UI then
+    if shared.standaloneUI then
         SendNUIMessage({
             type = "groupJoined"
         })
@@ -74,7 +84,7 @@ end)
 
 RegisterNetEvent("groups:GroupMembersUpdate", function(members)
     GROUP_MEMBERS = members
-    if Config.UI then
+    if shared.standaloneUI then
         SendNUIMessage({
             type = "groupJoined",
             members = members
@@ -88,7 +98,7 @@ end)
 
 RegisterNetEvent("groups:GroupLeaveEvent", function()
     task.Cleanup()
-    blip.ClearAll()
+    blips.ClearAll()
 end)
 
 RegisterNetEvent("groups:GroupCreateEvent", function()
@@ -117,12 +127,12 @@ RegisterNetEvent("groups:BlipCreate", function(name, data)
 end)
 
 RegisterNetEvent("groups:BlipDelete", function(name)
-    blip.Delete(name)
+    blips.Delete(name)
 end)
 
 -- NUI CALLBACKS
 RegisterNUICallback("CreateGroup", function(data, cb)
-    cb(RequestCreateGroup())
+    cb(CreateGroup())
 end)
 
 RegisterNUICallback("LeaveGroup", function(data, cb)
@@ -132,7 +142,7 @@ end)
 RegisterNUICallback("JoinGroup", function(data, cb)
     local success = RequestJoin()
     if success then
-        Notify("You have requested to join the group", "success")
+        util.notify("You have requested to join the group", "success")
     end
 end)
 

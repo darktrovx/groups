@@ -5,26 +5,48 @@ lua54 'yes'
 
 author 'devyn'
 
--- Manifest
 ui_page 'html/index.html'
+
+files {
+    -- UI
+	'html/**',
+    
+    -- CONFIG
+    'config/client.lua',
+    'config/server.lua',
+	'config/shared.lua',
+
+    -- GROUP4
+
+    -- [server]
+    'server/util.lua',
+    'server/blips.lua',
+    'server/task.lua',
+
+    -- [client]
+    'client/util.lua',
+    'client/blips.lua',
+    'client/task.lua',
+}
 
 shared_scripts {
     '@ox_lib/init.lua',
-    'shared/*.lua',
 }
 
 client_scripts {
     'client/main.lua',
-    'client/*.lua',
+    'client/group.lua',
+    'client/reputation.lua',
+    'client/util.lua',
+    'client/task.lua',
+    'client/entity.lua',
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua',
-    'server/*.lua',
-}
-
-files {
-	'html/**',
-	'web/**',
+    'server/group.lua',
+    'server/reputation.lua',
+    'server/util.lua',
+    'server/task.lua',
 }

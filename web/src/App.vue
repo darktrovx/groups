@@ -24,14 +24,14 @@
         },
         Close: function() {
             this.Display = false;
-            NUI.methods.NUICallback("close")
+            NUI.methods.Callback("Close")
         },
         JoinGroup: async function(id) {
-            const cb = await NUI.methods.NUICallback("JoinGroup", { groupID: id })
+            const cb = await NUI.methods.Callback("JoinGroup", { groupID: id })
             if (!cb) { return }
         },
         Create: async function() {
-            const cb = await NUI.methods.NUICallback("CreateGroup")
+            const cb = await NUI.methods.Callback("CreateGroup")
             if (!cb) { return }
             setTimeout(() => {
                 this.InGroup = true;
@@ -39,7 +39,7 @@
             }, 300);
         },
         Leave: async function() {
-            const cb = await NUI.methods.NUICallback("LeaveGroup")
+            const cb = await NUI.methods.Callback("LeaveGroup")
             if (!cb) { return }
             this.Cleanup()
         },
@@ -63,14 +63,11 @@
                 case "open":
                     this.Open()
                     break;
-                case "close":
-                    this.Close()
-                    break;
                 case "updateGroups":
                     this.Groups = event.data.groups
                     break;
                 case "groupJoined":
-                    Join(event.data);
+                    this.Join(event.data);
                     break;
             }
         });

@@ -1,45 +1,54 @@
 blip = {}
 
-function blip.Create(name, blipData)
-    if blipData == nil then return Debug("Invalid Data was passed to the create blip event") end
+function blip.Create(name, data)
+    if data == nil then return Debug('[Blip Create]',"Invalid Data was passed to the create blip event") end
 
-    blip.Delete(name)
+    blip.DeleteByName(name)
 
-    local blip = nil
-    if data.entity then
-        blip = AddBlipForEntity(data.entity)
+    local newBlip = nil
+    if data.coords then
+        newBlip = AddBlipForCoord(data.coords.x, data.coords.y, data.coords.z)
+    elseif data.entity then
+        newBlip = AddBlipForEntity(data.entity)
     elseif data.netId then 
-        blip = AddBlipForEntity(NetworkGetEntityFromNetworkId(data.netId))
+        newBlip = AddBlipForEntity(NetworkGetEntityFromNetworkId(data.netId))
     elseif data.radius then
-        blip = AddBlipForRadius(data.coords.x, data.coords.y, data.coords.z, data.radius)
+        newBlip = AddBlipForRadius(data.coords.x, data.coords.y, data.coords.z, data.radius)
     else
-        blip = AddBlipForCoord(data.coords)
+        newBlip = AddBlipForCoord(data.coords.x, data.coords.y, data.coords.z)
     end
 
-    if data.color == nil then data.color = 1 end
-    if data.alpha == nil then data.alpha = 255 end
+    data.color = data.color or 1
+    data.alpha = data.alpha or 255
 
     if not data.radius then
-        if data.sprite == nil then data.sprite = 1 end
-        if data.scale == nil then data.scale = 0.7 end
-        if data.label == nil then data.label = "NO LABEL FOUND" end
 
-        SetBlipSprite(blip, data.sprite)
-        SetBlipScale(blip, data.scale)
+        data.sprite = data.sprite or 1
+        data.scale = data.scale or 0.7
+        data.label = data.label or "NO LABEL FOUND"
+
+        SetBlipSprite(newBlip, data.sprite)
+        SetBlipScale(newBlip, data.scale)
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(data.label)
-        EndTextCommandSetBlipName(blip)
+        EndTextCommandSetBlipName(newBlip)
     end
     
-    SetBlipColour(blip, data.color)
-    SetBlipAlpha(blip, data.alpha)
+    SetBlipColour(newBlip, data.color)
+    SetBlipAlpha(newBlip, data.alpha)
+
+    if data.shortrange then
+        SetBlipAsShortRange(newBlip, true)
+    else
+        SetBlipAsShortRange(newBlip, false)
+    end
 
     if data.route then 
-        SetBlipRoute(blip, true)
-        if not data.routeColor then data.routeColor = data.color end
-        SetBlipRouteColour(blip, data.routeColor)
+        SetBlipRoute(newBlip, true)
+        data.routeColor = data.routeColor or data.color
+        SetBlipRouteColour(newBlip, data.routeColor)
     end
-    GROUP_BLIPS[#GROUP_BLIPS+1] = {name = name, blip = blip}
+    GROUP_BLIPS[#GROUP_BLIPS+1] = {name = name, blip = newBlip}
 end
 
 function blip.DeleteByName(name)

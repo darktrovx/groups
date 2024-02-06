@@ -3,7 +3,8 @@
 
 This script aims to replace and improve on my first iteration of a group handler.
 Still working on it but the base is there with working UI.
- 
+To use the built in UI navigate to config/shared.lua and set `standaloneUI = false` to `standaloneUI = true`
+
 There is also an npwd app I've made ( also still a WIP ) https://github.com/darktrovx/npwd_groups
 
 This update has no backwards compatibility and any existing group scripts will not work with it.

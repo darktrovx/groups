@@ -46,34 +46,49 @@ exports["groups"]:IsOwner()
 ```
 -- Gets members of passed groupID.
 exports["groups"]:GetMembers(groupID)
+
 -- Sets the state of a group.
 exports["groups"]:SetState(groupID, state)
+
 -- Gets group state.
 exports["groups"]:GetState(groupID)
+
 -- Starts group task with passed in data.
 exports["groups"]:StartTask(groupID, name, steps)
+
 -- Set the current task of the group.
 exports["groups"]:SetTask(groupID, task)
+
 -- Get the current task of a group.
 exports["groups"]:GetTask(groupID)
+
 -- Get the group that player is currently in.
 exports["groups"]:GetGroup(playerId)
+
 -- Get the group ID of a group the player is currently in.
 exports["groups"]:GetGroupID(playerId)
+
 -- Reward SINGLE member of a group via playerId.
 exports["groups"]:RewardMember(playerId, rewardData)
+
 -- Reward ALL members of a group.
 exports["groups"]:RewardMembers(groupID, rewardData)
+
 -- Triggers an event on ALL members of a group.
 exports["groups"]:TriggerEvent(groupID, event, data)
+
 -- Notifies ALL group members.
 exports["groups"]:Notify(groupID, notifData)
+
 -- Abandons current group (destroys)
 exports["groups"]:Abandon(groupID, playerId)
+
 -- Get the average reputation for a specific reputation for the entire group.
 exports["groups"]:GetAverageReputation(groupID, reputationName)
+
 -- Creates a blip for all group members.
 exports["groups"]:CreateBlip(groupID, blipName, blipData)
+
 -- Deletes a blip for the group.
 exports["groups"]:DeleteBlip(groupID, blipName)
 ```
@@ -111,8 +126,16 @@ exports['groups']:SetRep(citizenid, reputationName, amountToSet)
 -- Add amount to a reputation.
 exports['groups']:AddRep(citizenid, reputationName, amountToAdd)
 
+-- Add amounts from a list of reputations
+---@param reputations : table { ['garbage'] = 25, ['fishing'] = 5  }
+exports['groups']:AddMultipleRep(citizenid, reputations)
+
 -- Remove amount from reputation (cannot go lower than zero)
 exports['groups']:RemoveRep(citizenid, reputationName, amountToRemove)
+
+-- Remove amounts from a list of reputations
+---@param reputations : table { ['garbage'] = 25, ['fishing'] = 5  }
+exports['groups']:RemoveMultipleRep(citizenid, reputations)
 ```
 
 # Blips

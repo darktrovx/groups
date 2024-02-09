@@ -127,6 +127,12 @@ function reputation.AddRep(citizenid, name, value)
     TriggerClientEvent('groups:reputation:update', src, CACHE[citizenid].reputations)
 end
 
+function reputation.AddMultipleRep(citizenid, reputations)
+    for name, value in pairs(reputations) do
+        reputation.AddRep(citizenid, name, value)
+    end
+end
+
 function reputation.RemoveRep(citizenid, name, value)
     if CACHE[citizenid] then
         CACHE[citizenid].reputations[name] = CACHE[citizenid].reputations[name] or 0
@@ -148,6 +154,12 @@ function reputation.RemoveRep(citizenid, name, value)
             Debug('RemoveRep 3', 'Setting reputation for ' .. citizenid .. ' to 0 for ' .. name)
             reputation.SetRep(citizenid, name, 0)
         end
+    end
+end
+
+function reputation.RemoveMultipleRep(citizenid, reputations)
+    for name, value in pairs(reputations) do
+        reputation.RemoveRep(citizenid, name, value)
     end
 end
 
@@ -206,5 +218,15 @@ local function AddRep(citizenid, name, amount)
     reputation.AddRep(citizenid, name, amount)
 end
 exports('AddRep', AddRep)
+
+local function AddMultipleRep(citizenid, reputations)
+    reputation.AddMultipleRep(citizenid, reputations)
+end
+exports('AddMultipleRep', AddMultipleRep)
+
+local function RemoveMultipleRep(citizenid, reputations)
+    reputation.RemoveMultipleRep(citizenid, reputations)
+end
+exports('RemoveMultipleRep', RemoveMultipleRep)
 
 return reputation

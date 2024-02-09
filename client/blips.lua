@@ -6,14 +6,14 @@ function blip.Create(name, data)
     blip.DeleteByName(name)
 
     local newBlip = nil
-    if data.coords then
+    if data.radius then
+        newBlip = AddBlipForRadius(data.coords.x, data.coords.y, data.coords.z, data.radius)
+    elseif data.coords then
         newBlip = AddBlipForCoord(data.coords.x, data.coords.y, data.coords.z)
     elseif data.entity then
         newBlip = AddBlipForEntity(data.entity)
     elseif data.netId then 
         newBlip = AddBlipForEntity(NetworkGetEntityFromNetworkId(data.netId))
-    elseif data.radius then
-        newBlip = AddBlipForRadius(data.coords.x, data.coords.y, data.coords.z, data.radius)
     else
         newBlip = AddBlipForCoord(data.coords.x, data.coords.y, data.coords.z)
     end
@@ -54,23 +54,24 @@ end
 function blip.DeleteByName(name)
     local index = blip.Find(name)
     if index then
-        SetBlipRoute(GROUP_BLIPS[index], false)
-        RemoveBlip(GROUP_BLIPS[index])
+        Debug('[Blip Delete]', "Deleting Blip: "..name)
+        SetBlipRoute(GROUP_BLIPS[index].blip, false)
+        RemoveBlip(GROUP_BLIPS[index].blip)
         GROUP_BLIPS[index] = nil
     end
 end
 
 function blip.DeleteById(id)
     if GROUP_BLIPS[index] == nil then return end
-    SetBlipRoute(GROUP_BLIPS[index], false)
-    RemoveBlip(GROUP_BLIPS[index])
+    SetBlipRoute(GROUP_BLIPS[index].blip, false)
+    RemoveBlip(GROUP_BLIPS[index].blip)
     GROUP_BLIPS[index] = nil
 end
 
 function blip.Find(name)
     for i = 1, #GROUP_BLIPS do
-        if GROUP_BLIPS[i]["name"] == name then
-            return GROUP_BLIPS[i]
+        if GROUP_BLIPS[i] and GROUP_BLIPS[i].name == name then
+            return i
         end
     end
     return false

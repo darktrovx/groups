@@ -127,7 +127,7 @@ RegisterNetEvent("groups:BlipCreate", function(name, data)
 end)
 
 RegisterNetEvent("groups:BlipDelete", function(name)
-    blips.Delete(name)
+    blips.DeleteByName(name)
 end)
 
 -- NUI CALLBACKS

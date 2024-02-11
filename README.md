@@ -69,10 +69,10 @@ exports["groups"]:GetGroup(playerId)
 exports["groups"]:GetGroupID(playerId)
 
 -- Reward SINGLE member of a group via playerId.
-exports["groups"]:RewardMember(playerId, rewardData)
+exports["groups"]:RewardMember(playerId, data)
 
 -- Reward ALL members of a group.
-exports["groups"]:RewardMembers(groupID, rewardData)
+exports["groups"]:RewardMembers(groupID, data)
 
 -- Triggers an event on ALL members of a group.
 exports["groups"]:TriggerEvent(groupID, event, data)

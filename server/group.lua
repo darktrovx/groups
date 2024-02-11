@@ -310,13 +310,17 @@ function group.GetGroupID(source)
     return false
 end exports('GetGroupID', group.GetGroupID)
 
-function group.RewardMember(source, rewardData)
-    if rewardData.type == "money" then
-        util.addMoney(source, rewardData.account, rewardData.amount)
-        util.notify(source, "You have been rewarded $"..rewardData.amount, "success")
-    elseif rewardData.type == "item" then
-        util.addItem(source, rewardData.item, rewardData.amount)
-        util.notify(source, "You have been rewarded "..rewardData.amount.." "..rewardData.item, "success")
+function group.RewardMember(source, data)
+    if data.type == "money" then
+        util.addMoney(source, data.account, data.count)
+        if data.notify then
+            util.notify(source, "You have been rewarded $"..data.count, "success")
+        end
+    elseif data.type == "item" then
+        util.addItem(source, { item = data.item, count = data.count, metadata = data.metadata, slot = data.slot })
+        if data.notify then
+            util.notify(source, "You have been rewarded "..data.count.." "..data.item, "success")
+        end
     end
 end exports('RewardMember', group.RewardMember)
 

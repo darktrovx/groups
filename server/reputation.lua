@@ -123,8 +123,10 @@ function reputation.AddRep(citizenid, name, value)
             reputation.SetRep(citizenid, name, 0)
         end
     end
-    local src = exports.qbx_core:GetPlayerByCitizenId(citizenid).PlayerData.source
-    TriggerClientEvent('groups:reputation:update', src, CACHE[citizenid].reputations)
+    local target = exports.qbx_core:GetPlayerByCitizenId(citizenid)
+    if target then
+        TriggerClientEvent('groups:reputation:update', target.PlayerData.source, CACHE[citizenid].reputations)
+    end
 end
 
 function reputation.AddMultipleRep(citizenid, reputations)

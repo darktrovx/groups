@@ -4,6 +4,7 @@ local shared = require 'config.shared'
 local util = require 'server.util'
 local task = require 'server.task'
 local blip = require 'server.blips'
+local reputation = require 'server.reputation'
 
 function group.Create(source)
     Debug('[Create]', string.format("Group Create requested. SOURCE:  %s", source))
@@ -88,6 +89,7 @@ function group.AddPlayer(groupID, source)
         name = name,
         id = source,
         license = license,
+        citizenid = util.getPlayerCID(source),
         groupOwner = ps.groupOwner,
     }
 
@@ -413,7 +415,7 @@ function group.GroupAddRep(groupID, name, value, divide)
     end
 
     for i = 1, #members do
-        reputation.AddRep(members[i].id, name, value)
+        reputation.AddRep(members[i].citizenid, name, value)
     end
 end exports('GroupAddRep', group.GroupAddRep)
 
@@ -432,7 +434,7 @@ function group.GroupRemoveRep(groupID, name, value, divide)
     end
 
     for i = 1, #members do
-        reputation.RemoveRep(members[i].id, name, value)
+        reputation.RemoveRep(members[i].citizenid, name, value)
     end
 end exports('GroupRemoveRep', group.GroupRemoveRep)
 

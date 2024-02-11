@@ -30,7 +30,7 @@ end
 ---@param source number
 ---@param data table : { item: string, count: number, metadata: table, slot: number }
 function util.addItem(source, data)
-    local success, resp = exports.ox_inventory:AddItem(source, data.item, data.count, data.metadata, or false, data.slot or false)
+    local success, resp = exports.ox_inventory:AddItem(source, data.item, data.count, data.metadata or false, data.slot or false)
     return success, resp
 end
 

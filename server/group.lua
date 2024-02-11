@@ -398,6 +398,44 @@ function group.GetAverageReputation(groupID, name)
     return total / #members
 end exports('GetAverageReputation', group.GetAverageReputation)
 
+-- Adds rep to ALL members of the group
+-- divide: if true, value will be divided by the number of members
+function group.GroupAddRep(groupID, name, value, divide)
+    if not GROUPS[groupID] then
+        Debug('[GroupAddRep]', "Group does not exist.")
+        return
+    end
+
+    local members = group.GetMembers(groupID)
+
+    if divide then
+        value = value / #members
+    end
+
+    for i = 1, #members do
+        reputation.AddRep(members[i].id, name, value)
+    end
+end exports('GroupAddRep', group.GroupAddRep)
+
+-- Removes rep from ALL members of the group
+-- divide: if true, value will be divided by the number of members
+function group.GroupRemoveRep(groupID, name, value, divide)
+    if not GROUPS[groupID] then
+        Debug('[GroupRemoveRep]', "Group does not exist.")
+        return
+    end
+
+    local members = group.GetMembers(groupID)
+
+    if divide then
+        value = value / #members
+    end
+
+    for i = 1, #members do
+        reputation.RemoveRep(members[i].id, name, value)
+    end
+end exports('GroupRemoveRep', group.GroupRemoveRep)
+
 function group.CreateBlip(groupID, name, data)
     blip.Create(groupID, name, data)
 end exports('CreateBlip', group.CreateBlip)

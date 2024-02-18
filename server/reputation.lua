@@ -99,13 +99,22 @@ function reputation.SetRep(citizenid, name, value)
             reputation.SavePlayerRep(citizenid)
         end
     end
+    local target = exports.qbx_core:GetPlayerByCitizenId(citizenid)
+    if target then
+        TriggerClientEvent('groups:reputation:update', target.PlayerData.source, CACHE[citizenid].reputations)
+    end
 end
 
-function reputation.AddRep(citizenid, name, value)
+function reputation.AddRep(citizenid, name, value, limit)
     Debug('AddRep 1', 'Request add of ' .. value .. ' reputation from ' .. citizenid .. ' for ' .. name)
     if CACHE[citizenid] then
         CACHE[citizenid].reputations[name] = CACHE[citizenid].reputations[name] or 0
         local amount = CACHE[citizenid].reputations[name] += value
+
+        if limit and amount >= limit then
+            amount = limit
+        end
+
         Debug('AddRep 2', 'Request add of ' .. value .. ' reputation from ' .. citizenid .. ' for ' .. name)
         reputation.SetRep(citizenid, name, amount)
     else
@@ -116,16 +125,17 @@ function reputation.AddRep(citizenid, name, value)
             CACHE[citizenid].reputations = rep
             CACHE[citizenid].reputations[name] = CACHE[citizenid].reputations[name] or 0
             local amount = CACHE[citizenid].reputations[name] += value
+
+            if limit and amount >= limit then
+                amount = limit
+            end
+            
             Debug('AddRep 3', 'Request add of ' .. value .. ' reputation from ' .. citizenid .. ' for ' .. name)
             reputation.SetRep(citizenid, name, amount)
         else
             Debug('AddRep 4', 'Request add of 0 reputation from ' .. citizenid .. ' for ' .. name)
             reputation.SetRep(citizenid, name, 0)
         end
-    end
-    local target = exports.qbx_core:GetPlayerByCitizenId(citizenid)
-    if target then
-        TriggerClientEvent('groups:reputation:update', target.PlayerData.source, CACHE[citizenid].reputations)
     end
 end
 
@@ -230,5 +240,66 @@ local function RemoveMultipleRep(citizenid, reputations)
     reputation.RemoveMultipleRep(citizenid, reputations)
 end
 exports('RemoveMultipleRep', RemoveMultipleRep)
+
+-- COMMANDS
+lib.addCommand('setrep', {
+    help = 'Set reputation for a player',
+    restricted = 'group.admin',
+    params = {
+        {name = 'id', help = 'Player ID', type = 'number'},
+        {name = 'reputation', help = 'Reputation', type = 'string'},
+        {name = 'value', help = 'Value', type = 'number'},
+    }
+}, function(source, args)
+    local Target = exports.qbx_core:GetPlayer(args.id)
+    if not Target then return end
+
+    reputation.SetRep(Target.PlayerData.citizenid, args.reputation, args.value)
+
+    util.notify(source, {
+        type = 'info',
+        title = 'Repuation',
+        description = 'Set ' .. args.value .. ' reputation to ' .. Target.PlayerData.charinfo.firstname .. ' ' .. Target.PlayerData.charinfo.lastname .. ' for ' .. args.reputation
+    })
+end)
+
+lib.addCommand('removerep', {
+    help = 'Set reputation for a player',
+    restricted = 'group.admin',
+    params = {
+        {name = 'id', help = 'Player ID', type = 'number'},
+        {name = 'reputation', help = 'Reputation', type = 'string'},
+        {name = 'value', help = 'Value', type = 'number'},
+    }
+}, function(source, args)
+    local Target = exports.qbx_core:GetPlayer(args.id)
+    if not Target then return end
+
+    reputation.RemoveRep(Target.PlayerData.citizenid, args.reputation, args.value)
+    util.notify(source, {
+        type = 'info',
+        title = 'Repuation',
+        description = 'Removed ' .. args.value .. ' reputation from ' .. Target.PlayerData.charinfo.firstname .. ' ' .. Target.PlayerData.charinfo.lastname .. ' for ' .. args.reputation
+    })
+end)
+
+lib.addCommand('addrep', {
+    help = 'Set reputation for a player',
+    restricted = 'group.admin',
+    params = {
+        {name = 'id', help = 'Player ID', type = 'number'},
+        {name = 'reputation', help = 'Reputation', type = 'string'},
+        {name = 'value', help = 'Value', type = 'number'},
+    }
+}, function(source, args)
+    local Target = exports.qbx_core:GetPlayer(args.id)
+    if not Target then return end
+    reputation.AddRep(Target.PlayerData.citizenid, args.reputation, args.value)
+    util.notify(source, {
+        type = 'info',
+        title = 'Repuation',
+        description = 'Added ' .. args.value .. ' reputation to ' .. Target.PlayerData.charinfo.firstname .. ' ' .. Target.PlayerData.charinfo.lastname .. ' for ' .. args.reputation
+    })
+end)
 
 return reputation

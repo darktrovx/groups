@@ -4,7 +4,7 @@ local shared = require "config.shared"
 
 function task.Create(groupID, name, steps, limit)
     if TASKS[groupID] then
-        if TASKS[groupID].InProgress then
+        if TASKS[groupID].inProgress then
             Debug('[task.Create]', "Group already has a task in progress.")
             return false
         end
@@ -12,11 +12,11 @@ function task.Create(groupID, name, steps, limit)
 
         Debug('[task.Create]', "Creating task for group "..groupID..".")
         TASKS[groupID] = {
-            InProgress = true,
-            Name = name,
-            Steps = steps,
-            CurrentStep = 1,
-            GroupLimit = limit or shared.DefaultGroupLimit,
+            inProgress = true,
+            name = name,
+            steps = steps,
+            currentStep = 1,
+            groupLimit = limit or shared.DefaultGroupLimit,
         }
         Debug('[task.Create]', "Task Data: "..json.encode(steps))
         group.TriggerEvent(groupID, "groups:TaskCreate", { steps = steps })
@@ -25,24 +25,27 @@ function task.Create(groupID, name, steps, limit)
     end
 end
 
-function task.Delete()
+function task.Delete(groupID)
+    if not TASKS[groupID] then return false end
 
+    TASKS[groupID] = {
+        inProgress = false,
+        name = 'IDLE',
+        steps = {},
+        currentStep = 0,
+        groupLimit = shared.DefaultGroupLimit,
+    }
+
+    group.TriggerEvent(groupID, "groups:TaskUpdate", { steps = {}, step = 0 })
 end
 
-function task.Complete()
-
-end
-
-function task.Fail()
-
-end
 
 function task.SetStep(groupID, step)
     if TASKS[groupID] then
 
-        TASKS[groupID].CurrentStep = step
-
-        group.TriggerEvent(groupID, "groups:TaskUpdate", { step = step })
+        TASKS[groupID].currentStep = step
+        Debug("[SetStep] Group Step set to "..step)
+        group.TriggerEvent(groupID, "groups:TaskSetStep", { step = step })
 
         return true
     else
@@ -52,21 +55,28 @@ function task.SetStep(groupID, step)
 end
 
 function task.GetStep(groupID)
-
+    if TASKS[groupID] then
+        return TASKS[groupID].currentStep
+    else
+        Debug("[GetStep] Group does not exist.")
+        return 0
+    end
 end
 
 function task.InProgress(groupID)
     if TASKS[groupID] then
-        return TASKS[groupID].InProgress
+        return TASKS[groupID].inProgress
     else
         Debug('[InProgress] ', "Group does not exist.")
         return false
     end
 end
 
-function task.Update(groupID, step)
-    if TASKS[groupID] and TASKS[groupID].InProgress then
-        group.TriggerEvent(groupID, "groups:TaskUpdate", { step = step })
+function task.Update(groupID, steps, step)
+    if TASKS[groupID] and TASKS[groupID].inProgress then
+        steps = steps or TASKS[groupID].steps
+        step = step or 1
+        group.TriggerEvent(groupID, "groups:TaskUpdate", { steps = steps, step = step })
     else
         Debug("[TaskUpdate] Group does not exist or task is not in progress.")
     end
@@ -74,14 +84,10 @@ end
 
 function task.SetGroupLimit(groupID, limit)
     if TASKS[groupID] then
-        TASKS[groupID].GroupLimit = limit
+        TASKS[groupID].groupLimit = limit
     else
         Debug("[SetGroupLimit] Group does not exist.")
     end
-end
-
-function task.Cleanup()
-
 end
 
 return task

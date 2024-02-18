@@ -1,4 +1,5 @@
 local GROUP_MEMBERS = {}
+local GROUP_STATE = 'IDLE'
 
 local shared = require 'config.shared'
 local util = require 'client.util'
@@ -66,6 +67,11 @@ local function GetTaskData()
     return task.GetTaskData()
 end
 exports('GetTaskData', GetTaskData)
+
+local function GetCurrentStep()
+    return task.GetCurrentStep()
+end
+exports('GetCurrentStep', GetCurrentStep)
 
 local function IsOwner()
     return LocalPlayer.state.groupOwner

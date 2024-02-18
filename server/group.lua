@@ -105,7 +105,7 @@ function group.AddPlayer(groupID, source)
 end
 
 function group.RemovePlayer(groupID, playerID)
-    Debug('[RemovePlayer]', 'Removed Player : '..playerID..' from GROUP ID: '..groupID)
+    Debug('[RemovePlayer]', ('Removed Player : %s from GROUP ID: %s'):format(playerID, groupID))
     local ps = Player(playerID).state
     if not ps.groupID then
         Debug('[RemovePlayer]', "Player does not have a group.")
@@ -126,6 +126,14 @@ function group.GetMembers(groupID)
     end
     return GROUPS[groupID].members or {}
 end exports('GetMembers', group.GetMembers)
+
+function group.MemberCount(groupID)
+    if not GROUPS[groupID] then
+        Debug('[MemberCount]', "Group does not exist. GROUPID: "..tostring(groupID))
+        return
+    end
+    return #GROUPS[groupID].members
+end exports('MemberCount', group.MemberCount)
 
 function group.CreateRequest(groupID, source)
     if not GROUPS[groupID] then
@@ -215,7 +223,7 @@ end exports('SetState', group.SetState)
 function group.GetState(groupID)
     if not GROUPS[groupID] then
         Debug('[GetState]', "Group does not exist.")
-        return
+        return false
     end
 
     return GROUPS[groupID].state
@@ -229,6 +237,14 @@ function group.StartTask(groupID, name, steps)
 
     return task.Create(groupID, name, steps)
 end exports('StartTask', group.StartTask)
+
+function group.SetTaskStep(groupID, step)
+    if not GROUPS[groupID] then
+        Debug('[SetTaskStep]', "Group does not exist.")
+        return
+    end
+    task.SetStep(groupID, step)
+end exports('SetTaskStep', group.SetTaskStep)
 
 function group.SetTask(groupID, task)
     if not GROUPS[groupID] then
@@ -248,6 +264,22 @@ function group.GetTask(groupID)
 
     return GROUPS[groupID].task
 end exports('GetTask', group.GetTask)
+
+function group.ResetTask(groupID)
+    if not GROUPS[groupID] then
+        Debug('[ResetTask]', "Group does not exist.")
+        return false
+    end
+    task.Delete(groupID)
+end exports('ResetTask', group.ResetTask)
+
+function group.GetCurrentStep(groupID)
+    if not GROUPS[groupID] then
+        Debug('[GetCurrentStep]', "Group does not exist.")
+        return false
+    end
+    return task.GetStep(groupID)
+end exports('GetCurrentStep', group.GetCurrentStep)
 
 function group.SetOwner(groupID, source)
     if not GROUPS[groupID] then
@@ -273,12 +305,9 @@ function group.HandleOwnerLeave(groupID)
     end
 
     local members = group.GetMembers(groupID)
-    for i = 1, #members do
-        local source = GetPlayerFromIdentifier(members[i])
-        if source then
-            group.SetOwner(groupID, source)
-            break
-        end
+    for i = 2, #members do
+        group.SetOwner(groupID, members[i].id)
+        break
     end
 end
 
@@ -326,18 +355,20 @@ function group.RewardMember(source, data)
     end
 end exports('RewardMember', group.RewardMember)
 
-function group.RewardMembers(groupID, rewardData)
+function group.RewardMembers(groupID, rewardData, divide)
     if not GROUPS[groupID] then
         Debug('[RewardMembers]', "Group does not exist.")
         return
     end
 
     local members = group.GetMembers(groupID)
+
+    if divide then
+        rewardData.count = math.floor((rewardData.count / #members) + 0.5)
+    end
+
     for i = 1, #members do
-        local source = GetPlayerFromIdentifier(members[i])
-        if source then
-            group.RewardMember(groupID, source)
-        end
+        group.RewardMember(members[i].id, rewardData)
     end
 end exports('RewardMembers', group.RewardMembers)
 
@@ -347,17 +378,13 @@ function group.TriggerEvent(groupID, event, data)
 
     local members = group.GetMembers(groupID)
     for i=1, #members do
-        if data ~= nil then
-            TriggerClientEvent(event, members[i].id, data)
-        else 
-            TriggerClientEvent(event, members[i].id)
-        end
+        TriggerClientEvent(event, members[i].id, data)
+        Debug('[TriggerEvent]', string.format("GroupID: %s, Client: %s, Event: %s, Data: %s", groupID, members[i].id, event, json.encode(data)))
     end
 end exports('TriggerEvent', group.TriggerEvent)
 
 function group.Notify(groupID, notifData)
     if not GROUPS[groupID] then return Debug('[Notify]', "Group does not exist.") end
-    if text == nil then return Debug('[Notify]', "no valid text was passed to GroupNotify") end
 
     local members = group.GetMembers(groupID)
     for i=1,#members do
@@ -373,10 +400,7 @@ function group.Abandon(groupID, source)
 
     local members = group.GetMembers(groupID)
     for i = 1, #members do
-        local source = GetPlayerFromIdentifier(members[i])
-        if source then
-            group.RemovePlayer(groupID, source)
-        end
+        group.RemovePlayer(groupID, members[i].id)
     end
 
     GROUPS[groupID] = nil
@@ -402,7 +426,7 @@ end exports('GetAverageReputation', group.GetAverageReputation)
 
 -- Adds rep to ALL members of the group
 -- divide: if true, value will be divided by the number of members
-function group.GroupAddRep(groupID, name, value, divide)
+function group.GroupAddRep(groupID, name, value, divide, limit)
     if not GROUPS[groupID] then
         Debug('[GroupAddRep]', "Group does not exist.")
         return
@@ -415,7 +439,7 @@ function group.GroupAddRep(groupID, name, value, divide)
     end
 
     for i = 1, #members do
-        reputation.AddRep(members[i].citizenid, name, value)
+        reputation.AddRep(members[i].citizenid, name, value, limit)
     end
 end exports('GroupAddRep', group.GroupAddRep)
 

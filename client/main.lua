@@ -1,7 +1,7 @@
 TASK = {}
 GROUP_BLIPS = {}
 
-local shared = require 'config.shared'
+shared = require 'config.shared'
 
 function Debug(area, text)
     if not shared.debug then return end

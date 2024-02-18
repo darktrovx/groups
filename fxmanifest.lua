@@ -39,7 +39,6 @@ client_scripts {
     'client/reputation.lua',
     'client/util.lua',
     'client/task.lua',
-    'client/entity.lua',
 }
 
 server_scripts {

@@ -1,25 +1,15 @@
 task = {}
 
-function task.Create()
-
-end
-
-function task.Delete()
-
-end
-
 function task.Update(steps, step)
-    if not steps then
-        steps = TASK.steps or {}
+
+    if shared.standaloneUI then
+        SendNUIMessage({
+            type = "updateTask",
+            step = TASK.step,
+            steps = TASK.steps,
+        })
     end
-    if not step then
-        step = TASK.step or 1
-    end
-    SendNUIMessage({
-        type = "updateTask",
-        step = Task.step,
-        steps = TASK.steps,
-    })
+
     TriggerEvent("groups:SendTaskUpdate", steps, step)
 end
 
@@ -30,60 +20,27 @@ function task.GetTaskData()
     }
 end
 
-function task.Complete()
-
+function task.GetCurrentStep()
+    return TASK.step
 end
 
 function task.Cleanup()
     TASKS = {}
 end
 
-function task.CreateVehicle()
-
-end
-
-function task.DeleteVehicle()
-
-end
-
-function task.CreatePed()
-
-end
-
-function task.CreateEnemyPed()
-
-end
-
-function task.DeletePed()
-
-end
-
-function task.CreateObject()
-
-end
-
-function task.DeleteObject()
-
-end
-
-function task.CreateInteractable()
-
-end
-
-function task.DeleteInteractable()
-
-end
-
 -- EVENTS
 
-RegisterNetEvent("groups:TaskCreate", function(taskData)
-    TASK.steps = taskData.steps
-    TASK.step = 0
+RegisterNetEvent("groups:TaskCreate", function(data)
+    TASK.steps = data.steps
+    TASK.step = 1
 end)
 
-RegisterNetEvent("groups:TaskUpdate", function(steps, step)
-    TASK.step = step
-    task.Update(nil, step)
+RegisterNetEvent("groups:TaskUpdate", function(data)
+    task.Update(data.steps, data.step)
+end)
+
+RegisterNetEvent("groups:TaskSetStep", function(data)
+    TASK.step = data.step
 end)
 
 RegisterNetEvent("groups:SendTaskUpdate", function(steps, step)

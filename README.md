@@ -98,18 +98,18 @@ exports["groups"]:DeleteBlip(groupID, blipName)
 There is built in reputation xp to the script.
 It is optional and you can enable it by added the SQL below to your database and using the exports to add/remove/check reputations.
 
-## Reputation SQL
-```
+## Reputaation SQL
+```sql
 CREATE TABLE `group_rep` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`citizenid` VARCHAR(55) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`reputation` LONGTEXT NOT NULL COLLATE 'utf8mb4_bin',
 	UNIQUE INDEX `id` (`id`) USING BTREE,
+        UNIQUE INDEX `citizenid_unique` (`citizenid`),
 	CONSTRAINT `reputation` CHECK (json_valid(`reputation`))
 )
 COLLATE='utf8mb4_general_ci'
-ENGINE=InnoDB
-;
+ENGINE=InnoDB;
 ```
 
 ## Reputation Exports

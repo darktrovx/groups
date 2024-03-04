@@ -206,7 +206,7 @@ end)
 
 -- EXPORTS
 
-local function GetAllRep(citizenid, name)
+local function GetAllRep(citizenid)
     return reputation.GetAllRep(citizenid)
 end
 exports('GetAllRep', GetAllRep)

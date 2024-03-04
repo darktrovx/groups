@@ -43,6 +43,7 @@ function group.Delete(groupID)
         group.RemovePlayer(groupID, members[i].id)
     end
 
+    TriggerClientEvent('groups:GroupDeleteEvent', -1, groupID)
     GROUPS[groupID] = nil
     return true
 end
@@ -75,6 +76,12 @@ function group.AddPlayer(groupID, source)
     if #group.GetMembers(groupID) >= shared.groupMaxSize then
         Debug('[AddPlayer]', string.format("GroupID: %s is full", groupID))
         util.notify(source, "Group is full", "error")
+        return false
+    end
+
+    if GROUPS[groupID].state ~= "WAITING" then
+        Debug('[AddPlayer]', string.format("GroupID: %s is already active", groupID))
+        util.notify(source, { type = 'error', title = 'Group', description = 'Group is already doing something' })
         return false
     end
 
@@ -115,7 +122,15 @@ function group.RemovePlayer(groupID, playerID)
     ps.groupID = nil
     ps.groupOwner = false
 
+    for k,v in pairs(GROUPS[groupID].members) do
+        if v.id == playerID then
+            GROUPS[groupID].members[k] = nil
+            break
+        end
+    end
+
     TriggerClientEvent("groups:GroupLeaveEvent", playerID)
+    group.TriggerEvent(groupID, "groups:GroupMemberLeaveEvent", playerID)
     return true
 end
 
@@ -148,7 +163,14 @@ function group.CreateRequest(groupID, source)
         return false
     end
 
-    GROUPS[groupID].requests[#GROUPS[groupID].requests + 1] = { name = GetMemberName(source), id = source}
+    for i = 1, #GROUPS[groupID].requests do
+        if GROUPS[groupID].requests[i].id == source then
+            Debug('[CreateRequest]', "Player already has a request.")
+            return false
+        end
+    end
+
+    GROUPS[groupID].requests[#GROUPS[groupID].requests + 1] = { name = util.getMemberName(source), id = source}
     return true
 end
 
@@ -196,6 +218,7 @@ function group.AcceptRequest(groupID, source, requestID)
         end
 
         group.AddPlayer(groupID, requestSrc)
+        TriggerClientEvent("groups:requestUpdate", requestSrc, groupID, true)
         return group.DeleteRequest(groupID, requestID)
     end
 
@@ -514,6 +537,10 @@ end)
 RegisterNetEvent('groups:DenyRequest', function(requestID)
     local src = source
     local ps = Player(src).state
+
+    local requestSrc = GROUPS[ps.groupID].requests[requestID].id
+    TriggerClientEvent("groups:requestUpdate", requestSrc, ps.groupID, false)
+
     group.DeleteRequest(ps.groupID, src, requestID)
 end)
 

@@ -1,5 +1,5 @@
 return {
-    debug = false,
+    debug = true,
     standaloneUI = false,
     groupMaxSize = 4,
 }

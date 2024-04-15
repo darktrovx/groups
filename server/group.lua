@@ -19,6 +19,7 @@ function group.Create(source)
     GROUPS[id] = {
         state = "WAITING",
         groupOwner = source,
+        type = 'none',
         task = {},
         members = {},
         requests = {},
@@ -62,8 +63,9 @@ function group.GetGroups()
         end
     end
     return temp
-end
+end exports('GetGroups', group.GetGroups)
 
+-- Add a player to a group.
 function group.AddPlayer(groupID, source)
     local ps = Player(source).state
     if ps.groupID then
@@ -118,8 +120,9 @@ function group.AddPlayer(groupID, source)
         groupOwner = ps.groupOwner,
     })
 
-end
+end exports('AddPlayer', group.AddPlayer)
 
+-- Remove a player from a group.
 function group.RemovePlayer(groupID, playerID)
     Debug('[RemovePlayer]', ('Removed Player : %s from GROUP ID: %s'):format(playerID, groupID))
     lib.logger(playerID, 'remove', ('Removed Player : %s from GROUP ID: %s'):format(playerID, groupID))
@@ -143,8 +146,9 @@ function group.RemovePlayer(groupID, playerID)
     TriggerClientEvent("groups:GroupLeaveEvent", playerID)
     group.TriggerEvent(groupID, "groups:GroupMemberLeaveEvent", playerID)
     return true
-end
+end exports('RemovePlayer', group.RemovePlayer)
 
+-- Get members inside a group.
 function group.GetMembers(groupID)
     if not GROUPS[groupID] then
         lib.logger(0, 'getmembers', "Group does not exist. GROUPID: "..tostring(groupID))
@@ -154,6 +158,7 @@ function group.GetMembers(groupID)
     return GROUPS[groupID].members or {}
 end exports('GetMembers', group.GetMembers)
 
+-- Get the count of players in a group.
 function group.MemberCount(groupID)
     if not GROUPS[groupID] then
         lib.logger(0, 'membercount', "Group does not exist. GROUPID: "..tostring(groupID))
@@ -163,6 +168,7 @@ function group.MemberCount(groupID)
     return #GROUPS[groupID].members
 end exports('MemberCount', group.MemberCount)
 
+-- Create a join request for a group.
 function group.CreateRequest(groupID, source)
     if not GROUPS[groupID] then
         lib.logger(source, 'request', "Group does not exist.")
@@ -190,6 +196,7 @@ function group.CreateRequest(groupID, source)
     return true
 end
 
+-- Delete a join request for a group.
 function group.DeleteRequest(groupID, requestID)
     if not GROUPS[groupID] then
         lib.logger(0, 'deleterequest', "Group does not exist.")
@@ -205,8 +212,9 @@ function group.DeleteRequest(groupID, requestID)
 
     GROUPS[groupID].requests[requestID] = nil
     return true
-end
+end exports('DeleteRequest', group.DeleteRequest)
 
+-- Accept a join request for a group.
 function group.AcceptRequest(groupID, source, requestID)
 
     Debug('[AcceptRequest]', string.format("groupID: %s, requestID: %s", groupID, requestID))
@@ -246,8 +254,9 @@ function group.AcceptRequest(groupID, source, requestID)
     end
 
     return false
-end
+end exports('AcceptRequest', group.AcceptRequest)
 
+-- Get all join requests for a group.
 function group.GetRequests(groupID)
     if not GROUPS[groupID] then
         Debug('[GetRequests]', "Group does not exist.")
@@ -255,8 +264,9 @@ function group.GetRequests(groupID)
         return
     end
     return GROUPS[groupID].requests or {}
-end
+end exports('GetRequests', group.GetRequests)
 
+-- Set the state of a group.
 function group.SetState(groupID, state)
     if not GROUPS[groupID] then
         Debug('[SetState]', "Group does not exist.")
@@ -268,6 +278,7 @@ function group.SetState(groupID, state)
     group.TriggerEvent(groupID, "groups:GroupStateChangeEvent", { state = state })
 end exports('SetState', group.SetState)
 
+-- Get the state of a group.
 function group.GetState(groupID)
     if not GROUPS[groupID] then
         Debug('[GetState]', "Group does not exist.")
@@ -278,6 +289,13 @@ function group.GetState(groupID)
     return GROUPS[groupID].state
 end exports('GetState', group.GetState)
 
+-- TASKS -- 
+-- These are using to create constant and ordered steps for a group to follow.
+-- Step increments are manually change by the script developer.
+-- Steps are not automatically incremented.
+-- Step change events are replicated to all players inside the group.
+
+-- Start a task for a group.
 function group.StartTask(groupID, name, steps)
     if not GROUPS[groupID] then
         Debug('[StartTask]', "Group does not exist.")
@@ -288,15 +306,7 @@ function group.StartTask(groupID, name, steps)
     return task.Create(groupID, name, steps)
 end exports('StartTask', group.StartTask)
 
-function group.SetTaskStep(groupID, step)
-    if not GROUPS[groupID] then
-        Debug('[SetTaskStep]', "Group does not exist.")
-        lib.logger(0, 'settaskstep', "Group does not exist.")
-        return
-    end
-    task.SetStep(groupID, step)
-end exports('SetTaskStep', group.SetTaskStep)
-
+-- Get the current step of a task for a group.
 function group.SetTask(groupID, task)
     if not GROUPS[groupID] then
         Debug('[SetTask]', "Group does not exist.")
@@ -308,6 +318,7 @@ function group.SetTask(groupID, task)
     TriggerClientEvent("groups:GroupTaskChangeEvent", -1, groupID, task)
 end exports('SetTask', group.SetTask)
 
+-- Get the current task of a group.
 function group.GetTask(groupID)
     if not GROUPS[groupID] then
         Debug('[GetTask]', "Group does not exist.")
@@ -318,6 +329,7 @@ function group.GetTask(groupID)
     return GROUPS[groupID].task
 end exports('GetTask', group.GetTask)
 
+-- Reset the task for a group.
 function group.ResetTask(groupID)
     if not GROUPS[groupID] then
         Debug('[ResetTask]', "Group does not exist.")
@@ -327,6 +339,17 @@ function group.ResetTask(groupID)
     task.Delete(groupID)
 end exports('ResetTask', group.ResetTask)
 
+-- Set the current step of a task for a group.
+function group.SetTaskStep(groupID, step)
+    if not GROUPS[groupID] then
+        Debug('[SetTaskStep]', "Group does not exist.")
+        lib.logger(0, 'settaskstep', "Group does not exist.")
+        return
+    end
+    task.SetStep(groupID, step)
+end exports('SetTaskStep', group.SetTaskStep)
+
+-- Get the current step of a task for a group.
 function group.GetCurrentStep(groupID)
     if not GROUPS[groupID] then
         Debug('[GetCurrentStep]', "Group does not exist.")
@@ -336,6 +359,8 @@ function group.GetCurrentStep(groupID)
     return task.GetStep(groupID)
 end exports('GetCurrentStep', group.GetCurrentStep)
 
+-- Set the owner of a group.
+-- Using this will probably break anything the group is doing so be sure to handle it correctly.
 function group.SetOwner(groupID, source)
     if not GROUPS[groupID] then
         Debug('[SetOwner]', "Group does not exist.")
@@ -346,6 +371,7 @@ function group.SetOwner(groupID, source)
     util.notify(source, "You are now the groupOwner of the group", "success")
 end
 
+-- Get the owner of a group.
 function group.GetOwner(groupID)
     if not GROUPS[groupID] then
         Debug('[GetOwner]', "Group does not exist.")
@@ -354,10 +380,13 @@ function group.GetOwner(groupID)
     return GROUPS[groupID].groupOwner
 end exports('GetOwner', group.GetOwner)
 
+-- check if player is the owner of a group.
 function group.IsOwner(source)
     return Player(source).state.groupOwner
 end exports('IsOwner', group.IsOwner)
 
+-- Handle the owner leaving a group.
+-- If there are other members in the group, the owner will be set to the next member.
 function group.HandleOwnerLeave(groupID)
     if not GROUPS[groupID] then
         Debug('[HandleOwnerLeave]', "Group does not exist.")
@@ -373,6 +402,7 @@ function group.HandleOwnerLeave(groupID)
     return false
 end
 
+-- Get the group ID of the player, returns false if player is not in a group.
 function group.GetGroup(source)
     local license = GetPlayerIdentifierByType(source, 'license2') or GetPlayerIdentifierByType(source, 'license')
 
@@ -392,6 +422,49 @@ function group.GetGroupID(source)
     return Player(source).state.groupID
 end exports('GetGroupID', group.GetGroupID)
 
+-- Set the groups type flag.
+function group.SetType(groupID, typeName)
+
+    if not GROUPS[groupID] then
+        Debug('[SetType]', "Group does not exist.")
+        lib.logger(0, 'SetType', "Group does not exist.")
+        return false
+    end
+
+    if typeName == nil then
+        Debug('[SetType]', "No valid type was passed.")
+        lib.logger(0, 'SetType', "No valid type was passed.")
+        return false
+    end
+
+    GROUPS[groupID].type = typeName
+    Debug('[SetType]', ("Group Type set to: %s"):format(typeName))
+    lib.logger(0, 'SetType', ("Group Type set to: %s"):format(typeName))
+    return true
+end exports('SetType', group.SetType)
+
+-- Get the groups type flag.
+function group.GetType(groupID)
+    if not GROUPS[groupID] then
+        Debug('[GetType]', "Group does not exist.")
+        lib.logger(0, 'GetType', "Group does not exist.")
+        return false
+    end
+
+    return GROUPS[groupID].type
+end exports('GetType', group.GetType)
+
+-- Trigger an event for all groups of a certain type.
+function group.TriggerEventByType(groupType, event, data)
+    for groupID,_ in pairs(GROUPS) do
+        if group.GetType(groupID) == groupType then
+            group.TriggerEvent(groupID, event, data)
+        end
+    end
+end exports('TriggerEventByType', group.TriggerEventByType)
+
+-- Reward a member of a group.
+-- data: { type = "money" or "item", account = "bank" or "cash", count = 100, item = "itemname", metadata = {}, slot = 1, notify = true }
 function group.RewardMember(source, data)
     if data.type == "money" then
         util.addMoney(source, data.account, data.count)
@@ -408,6 +481,7 @@ function group.RewardMember(source, data)
     end
 end exports('RewardMember', group.RewardMember)
 
+-- Reward all members of a group.
 function group.RewardMembers(groupID, rewardData, divide)
     if not GROUPS[groupID] then
         Debug('[RewardMembers]', "Group does not exist.")
@@ -425,6 +499,7 @@ function group.RewardMembers(groupID, rewardData, divide)
     end
 end exports('RewardMembers', group.RewardMembers)
 
+-- Trigger an event for all members of a group.
 function group.TriggerEvent(groupID, event, data)
     if not GROUPS[groupID] then return Debug('[TriggerEvent]', "Group does not exist.") end
     if event == nil then return Debug('[TriggerEvent]', "no valid event was passed to GroupEvent") end
@@ -437,6 +512,7 @@ function group.TriggerEvent(groupID, event, data)
     end
 end exports('TriggerEvent', group.TriggerEvent)
 
+-- Notify all members of a group.
 function group.Notify(groupID, notifData)
     if not GROUPS[groupID] then return Debug('[Notify]', "Group does not exist.") end
 
@@ -446,6 +522,7 @@ function group.Notify(groupID, notifData)
     end
 end exports('Notify', group.Notify)
 
+-- Abandon a group.
 function group.Abandon(groupID, source)
     if not GROUPS[groupID] then
         Debug('[Abandon]', "Group does not exist.")
@@ -460,6 +537,9 @@ function group.Abandon(groupID, source)
     GROUPS[groupID] = nil
 end exports('Abandon', group.Abandon)
 
+-- REPUTATION --
+
+-- Get the average reputation of a group.
 function group.GetAverageReputation(groupID, name)
     if not GROUPS[groupID] then
         Debug('[GetAverageReputation]', "Group does not exist.")
@@ -517,10 +597,15 @@ function group.GroupRemoveRep(groupID, name, value, divide)
     end
 end exports('GroupRemoveRep', group.GroupRemoveRep)
 
+
+-- BLIPS --
+
+-- Creates a blip for all members of a group.
 function group.CreateBlip(groupID, name, data)
     blip.Create(groupID, name, data)
 end exports('CreateBlip', group.CreateBlip)
 
+-- Deletes a blip for all members of a group.
 function group.DeleteBlip(groupID, name)
     blip.Delete(groupID, name)
 end exports('DeleteBlip', group.DeleteBlip)
@@ -559,13 +644,16 @@ lib.callback.register('groups:GetMembers', function(source)
 end)
 
 -- Events
+-- These are here to help support third party functionality.
 
+-- Create a group.
 RegisterNetEvent('groups:AcceptRequest', function(requestID)
     local src = source
     local ps = Player(src).state
     group.AcceptRequest(ps.groupID, src, requestID)
 end)
 
+-- Deny a join request for a group.
 RegisterNetEvent('groups:DenyRequest', function(requestID)
     local src = source
     local ps = Player(src).state
@@ -576,22 +664,20 @@ RegisterNetEvent('groups:DenyRequest', function(requestID)
     group.DeleteRequest(ps.groupID, src, requestID)
 end)
 
+-- Kick a player from a group.
 RegisterNetEvent('groups:Kick', function(playerID)
     local src = source
     local ps = Player(src).state
     group.RemovePlayer(ps.groupID, playerID)
 end)
 
+-- Deletes group if player was owner.
 AddEventHandler('playerDropped', function(reason)
     local src = source
     local ps = Player(src).state
 
     if ps.groupID then
         if ps.groupOwner then
-            -- local success = group.HandleOwnerLeave(ps.groupID)
-            -- if not success then
-            --     group.Delete(ps.groupID)
-            -- end
             group.Delete(ps.groupID)
         end
         group.RemovePlayer(ps.groupID, src)

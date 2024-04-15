@@ -44,12 +44,12 @@ function task.SetStep(groupID, step)
     if TASKS[groupID] then
 
         TASKS[groupID].currentStep = step
-        Debug("[SetStep] Group Step set to "..step)
+        Debug("[SetStep]", ("Group Step set to %s "):format(step))
         group.TriggerEvent(groupID, "groups:TaskSetStep", { step = step })
 
         return true
     else
-        Debug("[SetStep] Group does not exist.")
+        Debug("[SetStep]", "Group does not exist.")
         return false
     end
 end

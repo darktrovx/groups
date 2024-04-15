@@ -92,6 +92,11 @@ local function IsOwner()
 end
 exports('IsOwner', IsOwner)
 
+local function GetState()
+    return GROUP_STATE
+end
+exports('GetState', GetState)
+
 -- EVENTS
 
 RegisterNetEvent("groups:GroupJoinEvent", function()
@@ -138,8 +143,8 @@ RegisterNetEvent("groups:GroupDeleteEvent", function(groupID)
     end
 end)
 
-RegisterNetEvent("groups:GroupStateChangeEvent", function()
-
+RegisterNetEvent("groups:GroupStateChangeEvent", function(data)
+    GROUP_STATE = data.state
 end)
 
 RegisterNetEvent("groups:GroupUpdateGroups", function(groups)

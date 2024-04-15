@@ -93,51 +93,6 @@ exports["groups"]:CreateBlip(groupID, blipName, blipData)
 exports["groups"]:DeleteBlip(groupID, blipName)
 ```
 
-
-# Reputation
-There is built in reputation xp to the script.
-It is optional and you can enable it by added the SQL below to your database and using the exports to add/remove/check reputations.
-
-## Reputation SQL
-```
-CREATE TABLE `group_rep` (
-	`id` INT(11) NOT NULL AUTO_INCREMENT,
-	`citizenid` VARCHAR(55) NOT NULL COLLATE 'utf8mb4_general_ci',
-	`reputation` LONGTEXT NOT NULL COLLATE 'utf8mb4_bin',
-	UNIQUE INDEX `id` (`id`) USING BTREE,
-	CONSTRAINT `reputation` CHECK (json_valid(`reputation`))
-)
-COLLATE='utf8mb4_general_ci'
-ENGINE=InnoDB
-;
-```
-
-## Reputation Exports
-```
--- Gets all Player reputations and values
-exports['groups']:GetRep(citizenid)
-
--- Gets a singluar rep and value.
-exports['groups']:GetRep(citizenid, reputationName)
-
--- Sets the reputation to the amount.
-exports['groups']:SetRep(citizenid, reputationName, amountToSet)
-
--- Add amount to a reputation.
-exports['groups']:AddRep(citizenid, reputationName, amountToAdd)
-
--- Add amounts from a list of reputations
----@param reputations : table { ['garbage'] = 25, ['fishing'] = 5  }
-exports['groups']:AddMultipleRep(citizenid, reputations)
-
--- Remove amount from reputation (cannot go lower than zero)
-exports['groups']:RemoveRep(citizenid, reputationName, amountToRemove)
-
--- Remove amounts from a list of reputations
----@param reputations : table { ['garbage'] = 25, ['fishing'] = 5  }
-exports['groups']:RemoveMultipleRep(citizenid, reputations)
-```
-
 # Blips
 Group managed blip system
 

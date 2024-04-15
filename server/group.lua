@@ -454,6 +454,18 @@ function group.GetType(groupID)
     return GROUPS[groupID].type
 end exports('GetType', group.GetType)
 
+-- Get all groups that match the type flag.
+-- returns list of group IDs.
+function group.GetGroupsByType(typeName)
+    local temp = {}
+    for groupID,_ in pairs(GROUPS) do
+        if GROUPS[groupID].type == typeName then
+            temp[#temp + 1] = groupID
+        end
+    end
+    return temp
+end exports('GetGroupsByType', group.GetGroupsByType)
+
 -- Trigger an event for all groups of a certain type.
 function group.TriggerEventByType(groupType, event, data)
     for groupID,_ in pairs(GROUPS) do

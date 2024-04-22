@@ -43,7 +43,9 @@ function group.Delete(groupID)
 
     local members = group.GetMembers(groupID)
     for i = 1, #members do
-        group.RemovePlayer(groupID, members[i].id)
+        if members[i] then
+            group.RemovePlayer(groupID, members[i].id)
+        end
     end
 
     TriggerClientEvent('groups:GroupDeleteEvent', -1, groupID)
@@ -136,16 +138,23 @@ function group.RemovePlayer(groupID, playerID)
     ps.groupID = nil
     ps.groupOwner = false
 
-    for k,v in pairs(GROUPS[groupID].members) do
+    if not GROUPS[groupID] then return true end
+    if not GROUPS[groupID].members then return true end
+    if #GROUPS[groupID].members == 1 then
+        return group.Delete(groupID)
+    end
+
+    for k, v in pairs(GROUPS[groupID].members) do
         if v.id == playerID then
             table.remove(GROUPS[groupID].members, k)
-            break
+            TriggerClientEvent("groups:GroupLeaveEvent", playerID)
+            group.TriggerEvent(groupID, "groups:GroupMemberLeaveEvent", playerID)
+            return true
         end
     end
 
-    TriggerClientEvent("groups:GroupLeaveEvent", playerID)
-    group.TriggerEvent(groupID, "groups:GroupMemberLeaveEvent", playerID)
-    return true
+    return false
+
 end exports('RemovePlayer', group.RemovePlayer)
 
 -- Get members inside a group.

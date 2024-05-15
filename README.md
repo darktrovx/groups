@@ -1,6 +1,8 @@
 # !!WIP!!
 ## This is the V2 of my original groups script.
 
+[DOCUMENTATION](https://devyn-docs.vercel.app/)
+
 This script aims to replace and improve on my first iteration of a group handler.
 Still working on it but the base is there with working UI.
 To use the built in UI navigate to config/shared.lua and set `standaloneUI = false` to `standaloneUI = true`

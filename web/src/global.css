@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
+:root {
+    --radius: 0.6vh;
+    --padding: 1vh;
+    --darkColor: #001219;
+    --secondaryDarkColor: #01151d;
+}
+
 html, body {
     margin: 0;
     padding: 0;
@@ -10,6 +17,7 @@ html, body {
     -webkit-scrollbar: none;
 }
 
-::-webkit-scrollbar {
-    display: none;
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    padding: 0;
 }

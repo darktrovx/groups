@@ -30,7 +30,8 @@ function group.Create(source)
     lib.logger(source, 'create', string.format("PlayerID: %s set groupOwner for groupID: %s", source, id))
 
     group.AddPlayer(id, source)
-
+    
+    TriggerClientEvent("groups:GroupUpdateGroups", source, group.GetGroups())
     return true
 end
 

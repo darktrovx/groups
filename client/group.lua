@@ -148,7 +148,7 @@ RegisterNetEvent("groups:GroupStateChangeEvent", function(data)
 end)
 
 RegisterNetEvent("groups:GroupUpdateGroups", function(groups)
-    if Config.UI then
+    if shared.standaloneUI then
         SendNUIMessage({
             type = "updateGroups",
             groups = groups

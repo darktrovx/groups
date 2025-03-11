@@ -1,8 +1,10 @@
 <script>
     import NUI from './NUI.vue';
+    import Button from './Button.vue';
     export default {
-        comonents: {
+        components: {
             NUI,
+            Button
         },
         name: 'Requests',
         data() { 
@@ -33,15 +35,20 @@
 
 <template>
     <div class="requests-container">
+        <h2>Requests</h2>
         <div class="request-list">
             <div class="no-requests" v-show="this.Requests.length == 0">
                 No Requests
             </div>
-            <div class="request-item" v-for="request in this.Requests">
-                <div class="request-item-name">{{ request.name }}</div>
-                <div class="request-item-buttons">
-                    <div class="request-item-button request-item-accept" @click="Accept(request.id)"><span><i class="fa-solid fa-user-plus"></i></span></div>
-                    <div class="request-item-button request-item-deny" @click="Deny(request.id)"><span><i class="fa-solid fa-user-xmark"></i></span></div>
+
+            <div class="request-item-container" v-show="this.Requests.length > 0">
+                <div class="request-item" v-for="request in this.Requests">
+                    <div class="request-item-name">{{ request.name }}</div>
+                    
+                    <div class="request-item-buttons">
+                        <Button class="accept" icon="fa-solid fa-user-plus" toolTip="Accept Request" @click="Accept(request.id)"/>
+                        <Button class="deny" icon="fa-solid fa-user-xmark" toolTip="Deny Request" @click="Deny(request.id)"/>
+                    </div>
                 </div>
             </div>
         </div>
@@ -50,31 +57,39 @@
 
 <style>
     .requests-container {
-        margin-top: 7vh;
+        display: flex;
+        flex-direction: column;
+        gap: 1vh;
+        height: 100%;
+        overflow: hidden;
     }
 
     .request-list {
-        min-width: 40vh;
-        max-width: 40vh;
-        min-height: 35vh;
-        max-height: 45vh;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        padding-top: 3vh;
-        -webkit-scrollbar: none;
+        height: 100%;
     }
 
     .no-requests {
-        font-size: 2vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
     }
 
+    .request-item-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1vh;
+        height: 100%;
+        overflow-y: auto;
+    }
+    
     .request-item {
         display: flex;
-        flex-direction: row;
-        margin-bottom: 2vh;
-        border-bottom: 1px solid #6c757d;
-        padding-bottom: 5px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.6vh 0.4vh;
+        border-radius: 0.8vh;
+        background-color: var(--secondaryDarkColor);
     }
 
     .request-item-name {
@@ -82,23 +97,24 @@
     }
 
     .request-item-buttons {
-        margin-left: 15vh;
-        float: right;
         display: flex;
         flex-direction: row;
+        gap: 0.4vh;
     }
 
-    .request-item-button {
-        margin-right: 2vh;
+    .accept {
+        background-color: #99e2b465;
     }
 
-    .request-item-accept:hover {
-        color: #b9fbc0;
-        cursor: pointer;
+    .deny {
+        background-color: #ee6f6f65;
     }
 
-    .request-item-deny:hover {
-        color: #e63946;
-        cursor: pointer;
-    }    
+    .accept:hover {
+        background-color: #99e2b449;
+    }
+
+    .deny:hover {
+        background-color: #ee6f6f48;
+    }
 </style>

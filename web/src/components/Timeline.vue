@@ -1,48 +1,60 @@
 <script>
-
+    import Label from './Label.vue';
     export default {
+        name: 'Timeline',
+        components: {
+            Label
+        },
         props: {
             Title: String,
             Description: String,
             Completed: Boolean,
             Active: Boolean
         },
-        name: 'Timeline',
         data() { return {} },
         methods: {}
     };
 </script>
 
 <template>
-    <div class="timeline-component timeline-content"
-        :style="this.Active ? 'border: 1px solid #fb8500; box-shadow: 5px 5px 10px #fb8500, -5px -5px 10px #fb8500;' : this.Completed ? 'border: 1px solid #b9fbc0; box-shadow: 5px 5px 10px #b9fbc0, -5px -5px 10px #b9fbc0;' : 'border: none;'">
+    <div class="timeline-component">
+        <div class="status">
+            <Label class="completed" v-show="this.Completed" text="Completed" icon="fas fa-check"/>
+            <Label class="active" v-show="this.Active" text="Active" icon="fas fa-circle-notch"/>
+        </div>
         <div class="timeline-title"><span>{{ this.Title }}</span></div>
         <div class="timeline-description"><span>{{ this.Description }}</span></div>
     </div>
 </template>
 
-<style>
+<style scoped>
 
-    .timeline-content {
-        background: #1f1f1f;
-        box-shadow: 5px 5px 10px #1a1a1a, -5px -5px 10px #242424;
+    .timeline-component {
+        background: var(--secondaryDarkColor);
         color: white;
         transition: 0.4s ease;
         overflow-wrap: break-word !important;
         border-radius: 6px;
+        padding: 1vh;
     }
 
-    .timeline-component {
-        margin: 0px 20px 20px 20px;
+    .completed {
+        background-color: #99e2b465;
+    }
+
+    .active {
+        background-color: #ffaa006b;
     }
 
     .timeline-title {
-        font-size: 2.0vh;
-        padding: 1vh 1vh 1vh 1vh;
+        font-size: 1.2vh;
+        font-weight: bold;
+        margin-top: 0.5vh;
     }
 
     .timeline-description {
-        font-size: 1.3vh;
-        padding: 1vh 1vh 1vh 1vh;
+        font-size: 1vh;
+        margin-top: 0.5vh;
     }
+    
 </style>

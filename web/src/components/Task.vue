@@ -13,7 +13,7 @@
         data() {
             return {
                 Steps: [],
-                Step: 0,
+                Step: 2,
             }
         },
         methods: {
@@ -41,6 +41,7 @@
 
 <template>
     <div class="timeline-container">
+        <h2>Current Tasks</h2>
         <div class="timeline">
             <Timeline v-show="this.Steps === undefined" Title="" Description="Waiting for a job" :Completed="false" :Active="false" />
             
@@ -55,21 +56,14 @@
     }
 
     .timeline-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow-y: scroll !important;
-        -webkit-scrollbar: none;
-        margin-top: 7vh;
+        height: 100%;
     }
 
     .timeline {
-        width: 80%;
-        max-height: 45vh;
         margin: 0 auto;
         display: flex;
+        gap: 1vh;
         flex-direction: column;
-        padding-top: 3vh;
         overflow-y: scroll !important;
         -webkit-scrollbar: none;
     } 
